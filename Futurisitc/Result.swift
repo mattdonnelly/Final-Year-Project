@@ -63,10 +63,19 @@ public enum Result<T> {
         }
     }
 
-    public func then<U>(f:T -> Result<U>) -> Result<U> {
+    public func then<U>(f: T -> Result<U>) -> Result<U> {
         switch self {
-        case Success(let wrapper):
-            return f(wrapper.value)
+        case Success(let boxedValue):
+            return f(boxedValue.value)
+        case Failure(let error):
+            return .Failure(error)
+        }
+    }
+    
+    public func map<U>(f: T -> U) -> Result<U> {
+        switch self {
+        case Success(let boxedValue):
+            return Result<U>(f(boxedValue.value))
         case Failure(let error):
             return .Failure(error)
         }

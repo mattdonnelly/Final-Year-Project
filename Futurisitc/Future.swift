@@ -67,9 +67,9 @@ public class Future<T> {
     public func then<U>(transform: T -> Future<U>) -> Future<U> {
         let future = Future<U>()
         
-        self.onComplete() { (v) in
+        self.onComplete() { value in
             let newFuture: Future<U> = {
-                switch v {
+                switch value {
                 case .Success(let wrapper):
                     return transform(wrapper.value)
                 case .Failure(let error):
@@ -79,8 +79,8 @@ public class Future<T> {
                 }
             }()
             
-            newFuture.onComplete() { (v) in
-                future.complete(v)
+            newFuture.onComplete() { value in
+                future.complete(value)
             }
         }
 
@@ -90,12 +90,32 @@ public class Future<T> {
     public func thenTry<U>(transform: Result<T> -> Future<U>) -> Future<U> {
         let future = Future<U>()
         
-        self.onComplete() { (v1) in
-            let newFuture = transform(v1)
-            newFuture.onComplete() { (v2) in
-                future.complete(v2)
+        self.onComplete() { value1 in
+            let newFuture = transform(value1)
+            newFuture.onComplete() { value2 in
+                future.complete(value2)
             }
         }
+
+        return future
+    }
+    
+    public func map<U>(transform: T -> Result<U>) -> Future<U> {
+        let future = Future<U>()
+        
+        self.onComplete() { value in
+            future.complete(value.then(transform))
+        }
+
+        return future
+    }
+    
+    public func tryMap<U>(transform: Result<T> -> Result<U>) -> Future<U> {
+        let future = Future<U>()
+        
+        self.onComplete({ (value: Result<T>) -> Void in
+            future.complete(transform(value))
+        })
 
         return future
     }
