@@ -8,29 +8,37 @@
 
 import Foundation
 
+func step1(a: Future<Int>) -> Future<Bool> {
+    return a.map {
+        return Result($0 & 1 == 0)
+    }
+}
+
+func step2(a: Future<Bool>) -> Future<String> {
+    return a.map {
+        if $0 {
+            return Result("Even")
+        }
+        else {
+            return Result("Odd")
+        }
+    }
+    .onSuccess {
+        println($0)
+    }
+}
+
 let sem = dispatch_semaphore_create(0)
 
 let promise1 = Promise<Int>()
 
-promise1.future.onSuccess{ res in
-        println(res)
-    }
-    .then { res -> Future<Int> in
-        let promise2 = Promise<Int>()
-        
-        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-    
-        dispatch_after(delayTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            promise2.resolve(2)
-            dispatch_semaphore_signal(sem)
-        }
-    
-        return promise2.future
-    }
-    .onSuccess { res2 in
-        println(res2)
-    }
+promise1.future |> (step1 >>> step2)
 
-promise1.resolve(1)
+let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
+
+dispatch_after(delayTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+    promise1.resolve(2)
+    dispatch_semaphore_signal(sem)
+}
 
 dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER)

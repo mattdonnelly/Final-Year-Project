@@ -13,6 +13,10 @@ public class Promise<T> {
     
     public init() { }
     
+    public init(_ future: Future<T>) {
+        self.future = future
+    }
+    
     public func resolve(value: T) {
         future.complete(Result(value))
     }

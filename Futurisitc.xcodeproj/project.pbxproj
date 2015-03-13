@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8B0620091A910449006DD77E /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0620081A910449006DD77E /* main.swift */; };
 		8B0620101A91045B006DD77E /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B06200F1A91045B006DD77E /* Future.swift */; };
+		8B6C0BEC1AB35FCB00DD9D97 /* Arrows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C0BEB1AB35FCB00DD9D97 /* Arrows.swift */; };
 		8B7E8B081AAE00B800E9BCA7 /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7E8B071AAE00B800E9BCA7 /* Promise.swift */; };
 		8BF804391A9BA2CE00493402 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF804381A9BA2CE00493402 /* Result.swift */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 		8B0620051A910449006DD77E /* Futurisitc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Futurisitc; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B0620081A910449006DD77E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8B06200F1A91045B006DD77E /* Future.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
+		8B6C0BEB1AB35FCB00DD9D97 /* Arrows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Arrows.swift; sourceTree = "<group>"; };
 		8B7E8B071AAE00B800E9BCA7 /* Promise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		8BF804381A9BA2CE00493402 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -64,6 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				8B0620081A910449006DD77E /* main.swift */,
+				8B6C0BEB1AB35FCB00DD9D97 /* Arrows.swift */,
 				8B06200F1A91045B006DD77E /* Future.swift */,
 				8B7E8B071AAE00B800E9BCA7 /* Promise.swift */,
 				8BF804381A9BA2CE00493402 /* Result.swift */,
@@ -128,6 +131,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BF804391A9BA2CE00493402 /* Result.swift in Sources */,
+				8B6C0BEC1AB35FCB00DD9D97 /* Arrows.swift in Sources */,
 				8B0620101A91045B006DD77E /* Future.swift in Sources */,
 				8B0620091A910449006DD77E /* main.swift in Sources */,
 				8B7E8B081AAE00B800E9BCA7 /* Promise.swift in Sources */,
