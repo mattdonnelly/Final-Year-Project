@@ -18,7 +18,7 @@ public class Promise<T> {
     }
     
     public func resolve(value: T) {
-        future.complete(Result(value))
+        future.complete(.Success(value))
     }
     
     public func reject(error: NSError) {

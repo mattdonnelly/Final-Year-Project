@@ -8,21 +8,9 @@
 
 import Foundation
 
-public final class Box<T> {
-    public let value: T
-    
-    public init(_ value: T) {
-        self.value = value
-    }
-}
-
 public enum Result<T> {
-    case Success(Box<T>)
+    case Success(@autoclosure () -> T)
     case Failure(NSError)
-    
-    public init(_ value: T) {
-        self = .Success(Box(value))
-    }
     
     public var isSuccess: Bool {
         get {
@@ -44,8 +32,8 @@ public enum Result<T> {
     public var value: T? {
         get {
             switch self {
-            case .Success(let boxedValue):
-                return boxedValue.value
+            case .Success(let wrappedValue):
+                return wrappedValue()
             default:
                 return nil
             }
@@ -65,8 +53,8 @@ public enum Result<T> {
 
     public func then<U>(f: T -> Result<U>) -> Result<U> {
         switch self {
-        case Success(let boxedValue):
-            return f(boxedValue.value)
+        case Success(let wrappedValue):
+            return f(wrappedValue())
         case Failure(let error):
             return .Failure(error)
         }
@@ -74,8 +62,8 @@ public enum Result<T> {
     
     public func map<U>(f: T -> U) -> Result<U> {
         switch self {
-        case Success(let boxedValue):
-            return Result<U>(f(boxedValue.value))
+        case Success(let wrappedValue):
+            return .Success(f(wrappedValue()))
         case Failure(let error):
             return .Failure(error)
         }

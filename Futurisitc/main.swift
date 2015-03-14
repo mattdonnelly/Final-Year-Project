@@ -10,17 +10,17 @@ import Foundation
 
 func step1(a: Future<Int>) -> Future<Bool> {
     return a.map {
-        return Result($0 & 1 == 0)
+        return .Success($0 & 1 == 0)
     }
 }
 
 func step2(a: Future<Bool>) -> Future<String> {
     return a.map {
         if $0 {
-            return Result("Even")
+            return .Success("Even")
         }
         else {
-            return Result("Odd")
+            return .Success("Odd")
         }
     }
     .onSuccess {
