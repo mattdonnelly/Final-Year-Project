@@ -8,16 +8,24 @@
 
 import Foundation
 
-infix operator |>  { }
-infix operator >>> { }
-infix operator *** { }
-infix operator &&& { }
+infix operator |>  { associativity left  precedence 100 }
+infix operator <|  { associativity right precedence 100 }
+infix operator >>> { associativity left  precedence 150 }
+infix operator *** { associativity left  precedence 200 }
+infix operator &&& { associativity left  precedence 200 }
 
 /** 
  *  A -> [f] -> B
  */
-func |> <A, B>(param: @autoclosure () -> A, f: A -> B) -> B {
-    return f(param())
+func |> <A, B>(left: A, right: A -> B) -> B {
+    return right(left)
+}
+
+/**
+ *  B <- [f] <- A
+ */
+func <| <A, B>(left: A -> B, right: A) -> B {
+    return left(right)
 }
 
 /**

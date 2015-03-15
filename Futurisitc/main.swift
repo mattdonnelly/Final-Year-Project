@@ -32,7 +32,7 @@ let sem = dispatch_semaphore_create(0)
 
 let promise1 = Promise<Int>()
 
-promise1.future |> (step1 >>> step2)
+promise1.future |> step1 >>> step2
 
 let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
 
