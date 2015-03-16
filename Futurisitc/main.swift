@@ -34,36 +34,40 @@ func parseJSON(a: Future<NSData>) -> Future<JSON> {
     return a.map { res in .Success(JSON(res)) }
 }
 
-func filterRepos(a: Future<JSON>) -> Future<[Repository]> {
+func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
     return a.map {
         let optionalFiltered = $0["items"].array?.filter {
             let star_count = $0["stargazers_count"].integer!
-            return star_count > 1000
+            return star_count > count
         }
         
         if let filtered = optionalFiltered {
             return .Success(filtered)
         }
         else {
-            return .Failure(NSError())
+            let userInfo = [
+                NSLocalizedDescriptionKey: NSLocalizedString("Repo filter failed", comment: ""),
+                NSLocalizedFailureReasonErrorKey: NSLocalizedString("Could not unwrap optional value", comment: ""),
+                NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Check request data", comment: "")
+            ]
+            return .Failure(NSError(domain: "com.mattdonnelly.demo", code: 1, userInfo: userInfo))
         }
     }
 }
 
 func countRepos(a: Future<[JSON]>) -> Future<Int> {
-    return a.map {
-        .Success($0.count)
-    }
-    .onSuccess {
-        println("Number of Swift repos with 1000+ stars: " + String($0))
-    }
-    .onFailure {
-        println($0)
-    }
+    return a.map { .Success($0.count) }
 }
 
 let promise = Promise<NSData>()
 
-promise.future |> parseJSON >>> filterRepos >>> countRepos
+let countFuture = promise.future |> parseJSON >>> filterRepos(1000) >>> countRepos
+
+countFuture.onSuccess {
+    println("Number of Swift repos with 1000+ stars: " + String($0))
+}
+.onFailure {
+    println($0)
+}
 
 startRequest(promise)
