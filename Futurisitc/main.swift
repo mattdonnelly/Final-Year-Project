@@ -8,37 +8,62 @@
 
 import Foundation
 
-func step1(a: Future<Int>) -> Future<Bool> {
+typealias Repository = JSON
+
+func startRequest(promise: Promise<NSData>) {
+    let sem = dispatch_semaphore_create(0)
+    
+    let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
+    let task = NSURLSession.sharedSession().dataTaskWithURL(requestURL!, completionHandler: { data, response, error in
+        if error == nil {
+            promise.resolve(data)
+        }
+        else {
+            promise.reject(error)
+        }
+        
+        dispatch_semaphore_signal(sem)
+    })
+    
+    task.resume()
+    
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER)
+}
+
+func parseJSON(a: Future<NSData>) -> Future<JSON> {
+    return a.map { res in .Success(JSON(res)) }
+}
+
+func filterRepos(a: Future<JSON>) -> Future<[Repository]> {
     return a.map {
-        return .Success($0 & 1 == 0)
+        let optionalFiltered = $0["items"].array?.filter {
+            let star_count = $0["stargazers_count"].integer!
+            return star_count > 1000
+        }
+        
+        if let filtered = optionalFiltered {
+            return .Success(filtered)
+        }
+        else {
+            return .Failure(NSError())
+        }
     }
 }
 
-func step2(a: Future<Bool>) -> Future<String> {
+func countRepos(a: Future<[JSON]>) -> Future<Int> {
     return a.map {
-        if $0 {
-            return .Success("Even")
-        }
-        else {
-            return .Success("Odd")
-        }
+        .Success($0.count)
     }
     .onSuccess {
+        println("Number of Swift repos with 1000+ stars: " + String($0))
+    }
+    .onFailure {
         println($0)
     }
 }
 
-let sem = dispatch_semaphore_create(0)
+let promise = Promise<NSData>()
 
-let promise1 = Promise<Int>()
+promise.future |> parseJSON >>> filterRepos >>> countRepos
 
-promise1.future |> step1 >>> step2
-
-let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(1 * Double(NSEC_PER_SEC)))
-
-dispatch_after(delayTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-    promise1.resolve(2)
-    dispatch_semaphore_signal(sem)
-}
-
-dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER)
+startRequest(promise)
