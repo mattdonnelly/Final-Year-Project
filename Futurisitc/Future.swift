@@ -8,6 +8,22 @@
 
 import Foundation
 
+public func future<T>(task: () -> Result<T>) -> Future<T> {
+    let promise = Promise<T>();
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        let result = task()
+        switch result {
+        case .Success(let wrappedValue):
+            promise.resolve(wrappedValue())
+        case .Failure(let error):
+            promise.reject(error)
+        }
+    }
+    
+    return promise.future
+}
+
 public class Future<T> {
     
     public var result: Result<T>?
@@ -64,7 +80,7 @@ public class Future<T> {
         return self
     }
 
-    public func then<U>(transform: T -> Future<U>) -> Future<U> {
+    public func flatMap<U>(transform: T -> Future<U>) -> Future<U> {
         let future = Future<U>()
         
         self.onComplete() { value in
@@ -87,7 +103,7 @@ public class Future<T> {
         return future
     }
     
-    public func thenTry<U>(transform: Result<T> -> Future<U>) -> Future<U> {
+    public func tryFlatMap<U>(transform: Result<T> -> Future<U>) -> Future<U> {
         let future = Future<U>()
         
         self.onComplete() { value1 in
