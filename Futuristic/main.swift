@@ -26,9 +26,9 @@ func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
         }
         else {
             let userInfo = [
-                NSLocalizedDescriptionKey: NSLocalizedString("Repo filter failed", comment: ""),
-                NSLocalizedFailureReasonErrorKey: NSLocalizedString("Could not unwrap optional value", comment: ""),
-                NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Check request data", comment: "")
+                NSLocalizedDescriptionKey: "Repo filter failed",
+                NSLocalizedFailureReasonErrorKey: "Could not unwrap optional value",
+                NSLocalizedRecoverySuggestionErrorKey: "Check request data"
             ]
             return .Failure(NSError(domain: "com.mattdonnelly.demo", code: 1, userInfo: userInfo))
         }

@@ -13,7 +13,7 @@ public func future<T>(task: () -> Result<T>) -> Future<T> {
 }
 
 public func future<T>(queue: dispatch_queue_t, task: () -> Result<T>) -> Future<T> {
-    let promise = Promise<T>();
+    let promise = Promise<T>()
     
     dispatch_async(queue) {
         let result = task()
