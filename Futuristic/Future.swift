@@ -9,9 +9,13 @@
 import Foundation
 
 public func future<T>(task: () -> Result<T>) -> Future<T> {
+    return future(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), task)
+}
+
+public func future<T>(queue: dispatch_queue_t, task: () -> Result<T>) -> Future<T> {
     let promise = Promise<T>();
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+    dispatch_async(queue) {
         let result = task()
         switch result {
         case .Success(let wrappedValue):
