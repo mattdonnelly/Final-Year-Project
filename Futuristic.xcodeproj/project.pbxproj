@@ -29,7 +29,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8B0620051A910449006DD77E /* Futurisitc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Futurisitc; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B0620051A910449006DD77E /* Futuristic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Futuristic; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B0620081A910449006DD77E /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8B06200F1A91045B006DD77E /* Future.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Future.swift; sourceTree = "<group>"; };
 		8B23C5A51AC03C5400D18759 /* DefferedURLRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefferedURLRequest.swift; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		8B061FFC1A910449006DD77E = {
 			isa = PBXGroup;
 			children = (
-				8B0620071A910449006DD77E /* Futurisitc */,
+				8B0620071A910449006DD77E /* Futuristic */,
 				8B0620061A910449006DD77E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,12 +61,12 @@
 		8B0620061A910449006DD77E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8B0620051A910449006DD77E /* Futurisitc */,
+				8B0620051A910449006DD77E /* Futuristic */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8B0620071A910449006DD77E /* Futurisitc */ = {
+		8B0620071A910449006DD77E /* Futuristic */ = {
 			isa = PBXGroup;
 			children = (
 				8B262E1F1AB7052F0063B9BD /* Demo */,
@@ -75,7 +75,7 @@
 				8B7E8B071AAE00B800E9BCA7 /* Promise.swift */,
 				8BF804381A9BA2CE00493402 /* Result.swift */,
 			);
-			path = Futurisitc;
+			path = Futuristic;
 			sourceTree = "<group>";
 		};
 		8B262E1F1AB7052F0063B9BD /* Demo */ = {
@@ -91,9 +91,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8B0620041A910449006DD77E /* Futurisitc */ = {
+		8B0620041A910449006DD77E /* Futuristic */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8B06200C1A910449006DD77E /* Build configuration list for PBXNativeTarget "Futurisitc" */;
+			buildConfigurationList = 8B06200C1A910449006DD77E /* Build configuration list for PBXNativeTarget "Futuristic" */;
 			buildPhases = (
 				8B0620011A910449006DD77E /* Sources */,
 				8B0620021A910449006DD77E /* Frameworks */,
@@ -103,9 +103,9 @@
 			);
 			dependencies = (
 			);
-			name = Futurisitc;
-			productName = Futurisitc;
-			productReference = 8B0620051A910449006DD77E /* Futurisitc */;
+			name = Futuristic;
+			productName = Futuristic;
+			productReference = 8B0620051A910449006DD77E /* Futuristic */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -122,7 +122,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8B0620001A910449006DD77E /* Build configuration list for PBXProject "Futurisitc" */;
+			buildConfigurationList = 8B0620001A910449006DD77E /* Build configuration list for PBXProject "Futuristic" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -134,7 +134,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8B0620041A910449006DD77E /* Futurisitc */,
+				8B0620041A910449006DD77E /* Futuristic */,
 			);
 		};
 /* End PBXProject section */
@@ -249,7 +249,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8B0620001A910449006DD77E /* Build configuration list for PBXProject "Futurisitc" */ = {
+		8B0620001A910449006DD77E /* Build configuration list for PBXProject "Futuristic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B06200A1A910449006DD77E /* Debug */,
@@ -258,7 +258,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8B06200C1A910449006DD77E /* Build configuration list for PBXNativeTarget "Futurisitc" */ = {
+		8B06200C1A910449006DD77E /* Build configuration list for PBXNativeTarget "Futuristic" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8B06200D1A910449006DD77E /* Debug */,

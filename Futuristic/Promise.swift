@@ -1,6 +1,6 @@
 //
 //  Promise.swift
-//  Futurisitc
+//  Futuristic
 //
 //  Created by Matt Donnelly on 09/03/2015.
 //  Copyright (c) 2015 Matt Donnelly. All rights reserved.
