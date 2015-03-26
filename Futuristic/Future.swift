@@ -24,7 +24,7 @@ public func future<T>(queue: dispatch_queue_t, task: () -> Result<T>) -> Future<
             promise.reject(error)
         }
     }
-    
+
     return promise.future
 }
 

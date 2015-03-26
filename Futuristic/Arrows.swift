@@ -9,8 +9,11 @@
 import Foundation
 
 infix operator |>  { associativity left  precedence 100 }
+infix operator |>^ { associativity left  precedence 100 }
 infix operator <|  { associativity right precedence 100 }
 infix operator >>> { associativity left  precedence 150 }
+infix operator >>- { associativity left  precedence 150 }
+infix operator >>^ { associativity left  precedence 150 }
 infix operator *** { associativity left  precedence 200 }
 infix operator &&& { associativity left  precedence 200 }
 
@@ -33,6 +36,14 @@ func <| <A, B>(left: A -> B, right: A) -> B {
  */
 func >>> <A, B, C>(f: Future<A> -> Future<B>, g: Future<B> -> Future<C>) -> (Future<A> -> Future<C>) {
     return { g(f($0)) }
+}
+
+func >>- <A, B, C>(f: Future<A> -> Future<B>, g: B -> Future<C>) -> (Future<A> -> Future<C>) {
+    return { f($0).flatMap(g) }
+}
+
+func >>^ <A, B, C>(f: Future<A> -> Future<B>, g: B -> Result<C>) -> (Future<A> -> Future<C>) {
+    return { f($0).map(g) }
 }
 
 /**

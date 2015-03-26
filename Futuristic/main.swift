@@ -14,29 +14,27 @@ func parseJSON(a: Future<NSData>) -> Future<JSON> {
     return a.map { res in .Success(JSON(res)) }
 }
 
-func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
-    return a.map {
-        let optionalFiltered = $0["items"].array?.filter {
-            let star_count = $0["stargazers_count"].integer!
-            return star_count > count
-        }
-        
-        if let filtered = optionalFiltered {
-            return .Success(filtered)
-        }
-        else {
-            let userInfo = [
-                NSLocalizedDescriptionKey: "Repo filter failed",
-                NSLocalizedFailureReasonErrorKey: "Could not unwrap optional value",
-                NSLocalizedRecoverySuggestionErrorKey: "Check request data"
-            ]
-            return .Failure(NSError(domain: "com.mattdonnelly.demo", code: 1, userInfo: userInfo))
-        }
+func filterRepos(count: Int)(json: JSON) -> Result<[Repository]> {
+    let optionalFiltered = json["items"].array?.filter {
+        let star_count = $0["stargazers_count"].integer!
+        return star_count > count
+    }
+    
+    if let filtered = optionalFiltered {
+        return .Success(filtered)
+    }
+    else {
+        let userInfo = [
+            NSLocalizedDescriptionKey: "Repo filter failed",
+            NSLocalizedFailureReasonErrorKey: "Could not unwrap optional value",
+            NSLocalizedRecoverySuggestionErrorKey: "Check request data"
+        ]
+        return .Failure(NSError(domain: "com.mattdonnelly.demo", code: 1, userInfo: userInfo))
     }
 }
 
-func countRepos(a: Future<[JSON]>) -> Future<Int> {
-    return a.map { .Success($0.count) }
+func countRepos(json: [JSON]) -> Result<Int> {
+    return .Success(json.count)
 }
 
 func printComplete(a: Future<Int>) -> Future<Int> {
@@ -51,7 +49,7 @@ func printComplete(a: Future<Int>) -> Future<Int> {
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
 
 let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
-                                                            >>> filterRepos(1000)
-                                                            >>> countRepos
+                                                            >>^ filterRepos(1000)
+                                                            >>^ countRepos
                                                             >>> printComplete
 future.wait()
