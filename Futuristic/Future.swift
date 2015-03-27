@@ -140,6 +140,30 @@ public class Future<T> {
         return future
     }
     
+    public func zip<U>(f: Future<U>) -> Future<(T,U)> {
+        let promise = Promise<(T,U)>()
+        
+        self.onComplete { result in
+            switch result {
+            case .Failure(let err):
+                promise.reject(err)
+            case .Success(let firstValue):
+                f.onComplete { result2 in
+                    switch result2 {
+                    case .Failure(let err):
+                        promise.reject(err)
+                    case .Success(let secondValue):
+                        let resultTuple = (firstValue(), secondValue())
+                        promise.resolve(resultTuple)
+                    }
+                }
+            }
+            return
+        }
+        
+        return promise.future
+    }
+    
     internal func complete(result: Result<T>) {
         if self.isCompleted {
             return

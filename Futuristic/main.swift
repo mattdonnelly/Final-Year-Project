@@ -52,11 +52,6 @@ func printComplete(sem: dispatch_semaphore_t)(a: Future<Int>) -> Future<Int> {
     }
 }
 
-
-func main() {
-
-}
-
 let sem = dispatch_semaphore_create(0)
 
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
