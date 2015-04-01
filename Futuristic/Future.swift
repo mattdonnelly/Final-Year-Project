@@ -164,6 +164,19 @@ public class Future<T> {
         return promise.future
     }
     
+    public func wait(timeout: dispatch_time_t = DISPATCH_TIME_FOREVER) -> Future<T> {
+        let sem = dispatch_semaphore_create(0)
+        
+        self.onSuccess { _ in
+            dispatch_semaphore_signal(sem)
+            return
+        }
+        
+        dispatch_semaphore_wait(sem, timeout)
+        
+        return self
+    }
+    
     internal func complete(result: Result<T>) {
         if self.isCompleted {
             return

@@ -46,7 +46,7 @@ func printComplete(sem: dispatch_semaphore_t)(a: Future<Int>) -> Future<Int> {
     .onFailure {
         println($0)
     }
-    .onSuccess { _ in
+    .onComplete { _ in
         dispatch_semaphore_signal(sem)
         return
     }
@@ -56,9 +56,9 @@ let sem = dispatch_semaphore_create(0)
 
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
 
-DefferedURLRequest.requestWithURL(requestURL!) |> parseJSON
-                                               >>> filterRepos(1000)
-                                               >>> countRepos
-                                               >>> printComplete(sem)
+let future = DefferedURLRequest.requestWithURL(requestURL!) |> parseJSON
+                                                            >>> filterRepos(1000)
+                                                            >>> countRepos
+                                                            >>> printComplete(sem)
 
-dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER)
+future.wait()
