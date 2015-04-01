@@ -39,26 +39,19 @@ func countRepos(a: Future<[JSON]>) -> Future<Int> {
     return a.map { .Success($0.count) }
 }
 
-func printComplete(sem: dispatch_semaphore_t)(a: Future<Int>) -> Future<Int> {
+func printComplete(a: Future<Int>) -> Future<Int> {
     return a.onSuccess {
         println("Number of Swift repos with 1000+ stars: " + String($0))
     }
     .onFailure {
         println($0)
     }
-    .onComplete { _ in
-        dispatch_semaphore_signal(sem)
-        return
-    }
 }
-
-let sem = dispatch_semaphore_create(0)
 
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
 
 let future = DefferedURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> filterRepos(1000)
                                                             >>> countRepos
-                                                            >>> printComplete(sem)
-
+                                                            >>> printComplete
 future.wait()
