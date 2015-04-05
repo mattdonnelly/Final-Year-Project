@@ -50,7 +50,7 @@ func printComplete(a: Future<Int>) -> Future<Int> {
 
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
 
-let future = DefferedURLRequest.requestWithURL(requestURL!) |> parseJSON
+let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> filterRepos(1000)
                                                             >>> countRepos
                                                             >>> printComplete

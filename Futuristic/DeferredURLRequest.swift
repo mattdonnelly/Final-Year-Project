@@ -1,5 +1,5 @@
 //
-//  DefferedURLRequest.swift
+//  DeferredURLRequest.swift
 //  Futuristic
 //
 //  Created by Matt Donnelly on 23/03/2015.
@@ -8,19 +8,19 @@
 
 import Foundation
 
-class DefferedURLRequest {
+class DeferredURLRequest {
 
     class func requestWithURL(URL: NSURL) -> Future<NSData> {
         let promise = Promise<NSData>()
         
-        let task = NSURLSession.sharedSession().dataTaskWithURL(URL, completionHandler: { data, response, error in
+        let task = NSURLSession.sharedSession().dataTaskWithURL(URL) { data, response, error in
             if error == nil {
                 promise.resolve(data)
             }
             else {
                 promise.reject(error)
             }
-        })
+        }
         
         task.resume()
         
