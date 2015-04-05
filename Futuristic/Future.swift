@@ -1,5 +1,5 @@
 //
-//  Promise.swift
+//  Future.swift
 //  Futuristic
 //
 //  Created by Matt Donnelly on 15/02/2015.
