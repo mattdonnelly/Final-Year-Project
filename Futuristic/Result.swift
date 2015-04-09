@@ -9,11 +9,8 @@
 import Foundation
 
 public class Box<T> {
-    let value: T
-    
-    public init(value: T) {
-        self.value = value
-    }
+    public let value: T
+    public init(value: T) { self.value = value }
 }
 
 public enum Result<T> {

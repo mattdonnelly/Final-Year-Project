@@ -55,5 +55,3 @@ let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> countRepos
                                                             >>> printComplete
 future.wait()
-
-println(zip([1,2,3], [4,5,6]))
