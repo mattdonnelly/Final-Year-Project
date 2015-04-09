@@ -17,21 +17,21 @@ infix operator &&& { associativity left  precedence 200 }
 /** 
  *  A ──▶ [f] ──▶ B
  */
-func |> <A, B>(left: A, right: A -> B) -> B {
-    return right(left)
+func |> <A, B>(value: A, transform: A -> B) -> B {
+    return transform(value)
 }
 
 /**
  *  B ◀── [f] ◀── A
  */
-func <| <A, B>(left: A -> B, right: A) -> B {
-    return left(right)
+func <| <A, B>(transform: A -> B, value: A) -> B {
+    return transform(value)
 }
 
 /**
  *  A ──▶ [f] ──▶ B ──▶ [g] ──▶ C
  */
-func >>> <A, B, C>(f: Future<A> -> Future<B>, g: Future<B> -> Future<C>) -> (Future<A> -> Future<C>) {
+func >>> <A, B, C>(f: A -> B, g: B -> C) -> (A -> C) {
     return { g(f($0)) }
 }
 
@@ -39,8 +39,8 @@ func >>> <A, B, C>(f: Future<A> -> Future<B>, g: Future<B> -> Future<C>) -> (Fut
  *  A ──▶ [f] ──▶ C
  *  B ──▶ [g] ──▶ D
  */
-func *** <A, B, C, D>(f: Future<A> -> Future<C>, g: Future<B> -> Future<D>) -> ((Future<A>, Future<B>)) -> (Future<C>, Future<D>) {
-    return { (f($0.0), g($0.1)) }
+func *** <A, B, C, D>(f: A -> C, g: B -> D) -> ((A, B)) -> (C, D) {
+    return first(f) >>> second(g)
 }
 
 /**
@@ -48,22 +48,30 @@ func *** <A, B, C, D>(f: Future<A> -> Future<C>, g: Future<B> -> Future<D>) -> (
  *  A ──┤
  *      └──▶ [g] ──▶ C
  */
-func &&& <A, B, C>(f: Future<A> -> Future<B>, g: Future<A> -> Future<C>) -> (Future<A> -> (Future<B>, Future<C>)) {
-    return { (f($0.0), g($0.0)) }
+func &&& <A, B, C>(f: A -> B, g: A -> C) -> (A -> (B, C)) {
+    func duplicate(value: A) -> (A, A) {
+        return (value, value)
+    }
+    
+    return duplicate >>> (f *** g)
 }
 
 /**
  *  A ──▶ [f] ──▶ C
  *  B ──────────▶ B
  */
-func first<A, B, C>(f: Future<A> -> Future<C>) -> ((Future<A>, Future<B>)) -> (Future<C>, Future<B>) {
+func first<A, B, C>(f: A -> C) -> ((A, B)) -> (C, B) {
     return { (f($0.0), $0.1) }
+}
+
+func swap<A, B>(pair: (A, B)) -> (B, A) {
+    return (pair.1, pair.0)
 }
 
 /**
  *  A ──────────▶ A
  *  B ──▶ [f] ──▶ C
  */
-func second<A, B, C>(f: Future<B> -> Future<C>) -> ((Future<A>, Future<B>)) -> (Future<A>, Future<C>) {
-    return { ($0.0, f($0.1)) }
+func second<A, B, C>(f: B -> C) -> ((A, B)) -> (A, C) {
+    return swap >>> first(f) >>> swap
 }
