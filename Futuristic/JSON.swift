@@ -17,7 +17,7 @@ public let JSONNull = JSONValue.JSONNull
 
 public enum JSON : Equatable, Printable {
     
-    case JSONString(Swift.String)
+    case JSONString(String)
     case JSONNumber(Double)
     case JSONObject(Dictionary<String, JSONValue>)
     case JSONArray(Array<JSON>)
@@ -111,7 +111,7 @@ public enum JSON : Equatable, Printable {
                 }
                 self = .JSONObject(newDict)
                 
-            case let string as NSString:
+            case let string as String:
                 self = .JSONString(string)
                 
             case let number as NSNumber:

@@ -11,7 +11,7 @@ import Foundation
 typealias Repository = JSON
 
 func parseJSON(a: Future<NSData>) -> Future<JSON> {
-    return a.map { res in .Success(JSON(res)) }
+    return a.map { res in Result(JSON(res)) }
 }
 
 func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
@@ -22,7 +22,7 @@ func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
         }
         
         if let filtered = optionalFiltered {
-            return .Success(filtered)
+            return Result(filtered)
         }
         else {
             let userInfo = [
@@ -36,7 +36,7 @@ func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
 }
 
 func countRepos(a: Future<[JSON]>) -> Future<Int> {
-    return a.map { .Success($0.count) }
+    return a.map { Result($0.count) }
 }
 
 func printComplete(a: Future<Int>) -> Future<Int> {
@@ -55,3 +55,5 @@ let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> countRepos
                                                             >>> printComplete
 future.wait()
+
+println(zip([1,2,3], [4,5,6]))

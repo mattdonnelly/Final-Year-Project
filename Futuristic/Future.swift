@@ -18,8 +18,8 @@ public func future<T>(queue: dispatch_queue_t, task: () -> Result<T>) -> Future<
     dispatch_async(queue) {
         let result = task()
         switch result {
-        case .Success(let wrappedValue):
-            promise.resolve(wrappedValue())
+        case .Success(let box):
+            promise.resolve(box.value)
         case .Failure(let error):
             promise.reject(error)
         }
@@ -41,7 +41,7 @@ public class Future<T> {
     internal init() { }
     
     public convenience init(f: () -> Result<T>) {
-        self.init(queue: NSOperationQueue.mainQueue(), f)
+        self.init(queue: NSOperationQueue.mainQueue(), f: f)
     }
     
     public init(queue: NSOperationQueue, f: () -> Result<T>) {
@@ -88,16 +88,15 @@ public class Future<T> {
         let future = Future<U>()
         
         self.onComplete() { value in
-            let newFuture: Future<U> = {
-                switch value {
-                case .Success(let wrapper):
-                    return transform(wrapper())
-                case .Failure(let error):
-                    let newFuture = Future<U>()
-                    newFuture.complete(.Failure(error))
-                    return newFuture
-                }
-            }()
+            let newFuture: Future<U>
+            
+            switch value {
+            case .Success(let box):
+                newFuture = transform(box.value)
+            case .Failure(let error):
+                newFuture = Future<U>()
+                newFuture.complete(.Failure(error))
+            }
             
             newFuture.onComplete() { value in
                 future.complete(value)
@@ -124,7 +123,7 @@ public class Future<T> {
         let future = Future<U>()
         
         self.onComplete { value in
-            future.complete(value.then(transform))
+            future.complete(value.flatMap(transform))
         }
 
         return future
@@ -147,13 +146,13 @@ public class Future<T> {
             switch result {
             case .Failure(let err):
                 promise.reject(err)
-            case .Success(let firstValue):
+            case .Success(let box1):
                 f.onComplete { result2 in
                     switch result2 {
                     case .Failure(let err):
                         promise.reject(err)
-                    case .Success(let secondValue):
-                        let resultTuple = (firstValue(), secondValue())
+                    case .Success(let box2):
+                        let resultTuple = (box1.value, box2.value)
                         promise.resolve(resultTuple)
                     }
                 }
@@ -186,9 +185,9 @@ public class Future<T> {
         self.result = result
         
         switch (result) {
-        case .Success(let wrappedValue):
+        case .Success(let box):
             for callback in self.successCallbacks {
-                callback(wrappedValue())
+                callback(box.value)
             }
         case .Failure(let error):
             for callback in self.failureCallbacks {

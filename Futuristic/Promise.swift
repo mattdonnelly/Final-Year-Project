@@ -9,16 +9,18 @@
 import Foundation
 
 public class Promise<T> {
-    public let future: Future<T> = Future()
+    public let future: Future<T>
     
-    public init() { }
+    convenience public init() {
+        self.init(Future())
+    }
     
     public init(_ future: Future<T>) {
         self.future = future
     }
     
     public func resolve(value: T) {
-        future.complete(.Success(value))
+        future.complete(Result(value))
     }
     
     public func reject(error: NSError) {
