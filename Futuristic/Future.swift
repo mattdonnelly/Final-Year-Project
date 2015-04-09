@@ -166,7 +166,7 @@ public class Future<T> {
     public func wait(timeout: dispatch_time_t = DISPATCH_TIME_FOREVER) -> Future<T> {
         let sem = dispatch_semaphore_create(0)
         
-        self.onSuccess { _ in
+        self.onComplete { _ in
             dispatch_semaphore_signal(sem)
             return
         }
