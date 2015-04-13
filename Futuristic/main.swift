@@ -10,33 +10,21 @@ import Foundation
 
 typealias Repository = JSON
 
-func parseJSON(a: Future<NSData>) -> Future<JSON> {
-    return a.map { res in Result(JSON(res)) }
+func parseJSON(a: NSData) -> JSON {
+    return JSON(a)
 }
 
-func filterRepos(count: Int)(a: Future<JSON>) -> Future<[Repository]> {
-    return a.map {
-        let optionalFiltered = $0["items"].array?.filter {
-            let star_count = $0["stargazers_count"].integer!
-            return star_count > count
-        }
-        
-        if let filtered = optionalFiltered {
-            return Result(filtered)
-        }
-        else {
-            let userInfo = [
-                NSLocalizedDescriptionKey: "Repo filter failed",
-                NSLocalizedFailureReasonErrorKey: "Could not unwrap optional value",
-                NSLocalizedRecoverySuggestionErrorKey: "Check request data"
-            ]
-            return .Failure(NSError(domain: "com.mattdonnelly.demo", code: 1, userInfo: userInfo))
-        }
+func filterRepos(count: Int)(json: JSON) -> [Repository] {
+    let filtered = json["items"].array?.filter {
+        let star_count = $0["stargazers_count"].integer!
+        return star_count > count
     }
+        
+    return filtered!
 }
 
-func countRepos(a: Future<[JSON]>) -> Future<Int> {
-    return a.map { Result($0.count) }
+func countRepos(json: [JSON]) -> Int {
+    return json.count
 }
 
 func printComplete(a: Future<Int>) -> Future<Int> {
@@ -53,5 +41,5 @@ let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=lan
 let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> filterRepos(1000)
                                                             >>> countRepos
-                                                            >>> printComplete
+                                                            ~ printComplete
 future.wait()

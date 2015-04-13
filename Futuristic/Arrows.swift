@@ -10,6 +10,7 @@ import Foundation
 
 infix operator |>  { associativity left  precedence 100 }
 infix operator <|  { associativity right precedence 100 }
+infix operator ~   { associativity right precedence 120 }
 infix operator >>> { associativity left  precedence 150 }
 infix operator *** { associativity left  precedence 200 }
 infix operator &&& { associativity left  precedence 200 }
@@ -33,6 +34,13 @@ func <| <A, B>(transform: A -> B, value: A) -> B {
  */
 func >>> <A, B, C>(f: A -> B, g: B -> C) -> (A -> C) {
     return { g(f($0)) }
+}
+
+/**
+ *  A ──▶ lift(f) ──▶ B ──▶ [g] ──▶ C
+ */
+func ~ <A, B, C>(f: A -> B, g: Future<B> -> Future<C>) -> Future<A> -> Future<C> {
+    return liftF(f) >>> g
 }
 
 /**

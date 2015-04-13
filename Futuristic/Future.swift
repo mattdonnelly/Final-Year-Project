@@ -8,6 +8,10 @@
 
 import Foundation
 
+public func liftF<A, B>(f: A -> B) -> Future<A> -> Future<B> {
+    return { $0.map { res in Result(f(res)) } }
+}
+
 public func future<T>(task: () -> Result<T>) -> Future<T> {
     return future(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), task)
 }
@@ -37,7 +41,7 @@ public class Future<T> {
     var successCallbacks: [T -> Void] = []
     var failureCallbacks: [NSError -> Void] = []
     var completeCallbacks: [Result<T> -> Void] = []
-    
+
     internal init() { }
     
     public convenience init(f: () -> Result<T>) {
