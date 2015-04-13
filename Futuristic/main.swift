@@ -15,12 +15,10 @@ func parseJSON(a: NSData) -> JSON {
 }
 
 func filterRepos(count: Int)(json: JSON) -> [Repository] {
-    let filtered = json["items"].array?.filter {
+    return json["items"].array!.filter {
         let star_count = $0["stargazers_count"].integer!
         return star_count > count
     }
-        
-    return filtered!
 }
 
 func countRepos(json: [JSON]) -> Int {
