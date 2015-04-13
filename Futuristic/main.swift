@@ -21,8 +21,8 @@ func filterRepos(count: Int)(json: JSON) -> [Repository] {
     }
 }
 
-func countRepos(json: [JSON]) -> Int {
-    return json.count
+func countRepos(repos: [Repository]) -> Int {
+    return repos.count
 }
 
 func printComplete(a: Future<Int>) -> Future<Int> {
