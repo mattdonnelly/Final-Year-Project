@@ -39,5 +39,5 @@ let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=lan
 let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
                                                             >>> filterRepos(1000)
                                                             >>> countRepos
-                                                            ~ printComplete
+                                                            >>^ printComplete
 future.wait()

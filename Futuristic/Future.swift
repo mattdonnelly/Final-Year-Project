@@ -38,9 +38,9 @@ public class Future<T> {
 
     public var isCompleted: Bool = false
     
-    var successCallbacks: [T -> Void] = []
-    var failureCallbacks: [NSError -> Void] = []
-    var completeCallbacks: [Result<T> -> Void] = []
+    private var successCallbacks: [T -> Void] = []
+    private var failureCallbacks: [NSError -> Void] = []
+    private var completeCallbacks: [Result<T> -> Void] = []
 
     internal init() { }
     
