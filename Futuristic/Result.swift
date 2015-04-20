@@ -22,50 +22,33 @@ public enum Result<T> {
     }
     
     public var isSuccess: Bool {
-        get {
-            switch self {
-            case .Success(_):
-                return true
-            case .Failure(_):
-                return false
-            }
+        switch self {
+        case .Success(_):
+            return true
+        case .Failure(_):
+            return false
         }
     }
     
     public var isFailure: Bool {
-        get {
-            return !self.isSuccess
-        }
+        return !self.isSuccess
     }
     
     public var value: T? {
-        get {
-            switch self {
-            case .Success(let box):
-                return box.value
-            default:
-                return nil
-            }
+        switch self {
+        case .Success(let box):
+            return box.value
+        default:
+            return nil
         }
     }
     
     public var error: NSError? {
-        get {
-            switch self {
-            case .Failure(let error):
-                return error
-            default:
-                return nil
-            }
-        }
-    }
-
-    public func flatMap<U>(f: T -> Result<U>) -> Result<U> {
         switch self {
-        case Success(let box):
-            return f(box.value)
-        case Failure(let error):
-            return .Failure(error)
+        case .Failure(let error):
+            return error
+        default:
+            return nil
         }
     }
     
@@ -73,6 +56,15 @@ public enum Result<T> {
         switch self {
         case Success(let box):
             return Result<U>(f(box.value))
+        case Failure(let error):
+            return .Failure(error)
+        }
+    }
+
+    public func flatMap<U>(f: T -> Result<U>) -> Result<U> {
+        switch self {
+        case Success(let box):
+            return f(box.value)
         case Failure(let error):
             return .Failure(error)
         }

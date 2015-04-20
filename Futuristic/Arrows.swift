@@ -8,12 +8,13 @@
 
 import Foundation
 
-infix operator |>  { associativity left  precedence 100 }
-infix operator <|  { associativity right precedence 100 }
-infix operator >>> { associativity left  precedence 150 }
-infix operator >>^ { associativity right precedence 120 }
-infix operator *** { associativity left  precedence 200 }
-infix operator &&& { associativity left  precedence 200 }
+infix operator |>  { associativity right precedence 100 }
+infix operator ~>  { associativity right precedence 100 }
+infix operator >>> { associativity right precedence 200 }
+infix operator <<< { associativity left  precedence 200 }
+infix operator >>^ { associativity right precedence 175 }
+infix operator *** { associativity right precedence 150 }
+infix operator &&& { associativity right precedence 150 }
 
 /** 
  *  A ──▶ [f] ──▶ B
@@ -22,11 +23,8 @@ func |> <A, B>(value: A, transform: A -> B) -> B {
     return transform(value)
 }
 
-/**
- *  B ◀── [f] ◀── A
- */
-func <| <A, B>(transform: A -> B, value: A) -> B {
-    return transform(value)
+func ~> <A, B>(value: Future<A>, transform: A -> B) -> Future<B> {
+    return value |> liftF(transform)
 }
 
 /**
@@ -34,6 +32,13 @@ func <| <A, B>(transform: A -> B, value: A) -> B {
  */
 func >>> <A, B, C>(f: A -> B, g: B -> C) -> (A -> C) {
     return { g(f($0)) }
+}
+
+/**
+*  A ──▶ [f] ──▶ B ──▶ [g] ──▶ C
+*/
+func <<< <A, B, C>(f: B -> C, g: A -> B) -> (A -> C) {
+    return g >>> f
 }
 
 /**
@@ -69,7 +74,7 @@ func &&& <A, B, C>(f: A -> B, g: A -> C) -> (A -> (B, C)) {
  *  B ──────────▶ B
  */
 func first<A, B, C>(f: A -> C) -> ((A, B)) -> (C, B) {
-    return { (f($0.0), $0.1) }
+    return { (f($0), $1) }
 }
 
 func swap<A, B>(pair: (A, B)) -> (B, A) {

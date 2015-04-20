@@ -9,83 +9,95 @@
 import Foundation
 
 public func liftF<A, B>(f: A -> B) -> Future<A> -> Future<B> {
-    return { $0.map { res in Result(f(res)) } }
+    return { $0.map { res in f(res) } }
 }
 
-public func future<T>(task: () -> Result<T>) -> Future<T> {
-    return future(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), task)
-}
-
-public func future<T>(queue: dispatch_queue_t, task: () -> Result<T>) -> Future<T> {
-    let promise = Promise<T>()
+public func zip<A, B>(f1: Future<A>, f2: Future<B>) -> Future<(A, B)> {
+    let future = Future<(A, B)>()
     
-    dispatch_async(queue) {
-        let result = task()
-        switch result {
-        case .Success(let box):
-            promise.resolve(box.value)
-        case .Failure(let error):
-            promise.reject(error)
+    f1.onComplete { result1 in
+        switch result1 {
+        case .Failure(let err):
+            future.complete(.Failure(err))
+        case .Success(let boxedValue1):
+            f2.onComplete { result2 in
+                switch result2 {
+                case .Failure(let err):
+                    future.complete(.Failure(err))
+                case .Success(let boxedValue2):
+                  future.complete(Result((boxedValue1.value, boxedValue2.value)))
+                }
+            }
         }
     }
     
-    return promise.future
+    return future
 }
 
 public class Future<T> {
     
     public var result: Result<T>?
 
-    public var isCompleted: Bool = false
+    private var completionHandlers: [Result<T> -> Void] = []
     
-    private var successCallbacks: [T -> Void] = []
-    private var failureCallbacks: [NSError -> Void] = []
-    private var completeCallbacks: [Result<T> -> Void] = []
+    public var isCompleted: Bool {
+        return self.result != nil
+    }
+    
+    public var isPending: Bool {
+        return self.result == nil
+    }
+    
+    public var isSuccess: Bool {
+        if let result = self.result {
+            return result.isSuccess
+        }
+        return false
+    }
+    
+    public var isFailure: Bool {
+        if let result = self.result {
+            return result.isFailure
+        }
+        return false
+    }
 
     internal init() { }
     
-    public convenience init(f: () -> Result<T>) {
-        self.init(queue: NSOperationQueue.mainQueue(), f: f)
+    public convenience init(queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), f: () -> T) {
+        self.init(queue: queue, f: { Result(f()) })
     }
     
-    public init(queue: NSOperationQueue, f: () -> Result<T>) {
-        queue.addOperationWithBlock() {
+    public init(queue: dispatch_queue_t = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), f: () -> Result<T>) {
+        dispatch_async(queue) {
             self.complete(f())
         }
     }
 
     public func onComplete(callback: Result<T> -> Void) -> Future {
-        if self.isCompleted {
-            callback(self.result!)
+        if let result = self.result {
+            callback(result)
         } else {
-            self.completeCallbacks.append(callback)
+            self.completionHandlers.append(callback)
         }
         
         return self
     }
     
     public func onSuccess(callback: T -> Void) -> Future {
-        if self.isCompleted {
-            if let value = self.result?.value {
+        return self.onComplete {
+            if let value = $0.value {
                 callback(value)
             }
-        } else {
-            self.successCallbacks.append(callback)
         }
-        
-        return self
     }
     
     public func onFailure(callback: NSError -> Void) -> Future {
-        if self.isCompleted {
-            if let error = self.result?.error {
+        return self.onComplete {
+            if let error = $0.error {
                 callback(error)
             }
-        } else {
-            self.failureCallbacks.append(callback)
         }
-        
-        return self
     }
 
     public func flatMap<U>(transform: T -> Future<U>) -> Future<U> {
@@ -123,11 +135,12 @@ public class Future<T> {
         return future
     }
     
-    public func map<U>(transform: T -> Result<U>) -> Future<U> {
+    public func map<U>(transform: T -> U) -> Future<U> {
         let future = Future<U>()
         
-        self.onComplete { value in
-            future.complete(value.flatMap(transform))
+        self.onSuccess { _ in
+            future.complete(self.result!.map(transform))
+            return
         }
 
         return future
@@ -141,30 +154,6 @@ public class Future<T> {
         }
 
         return future
-    }
-    
-    public func zip<U>(f: Future<U>) -> Future<(T,U)> {
-        let promise = Promise<(T,U)>()
-        
-        self.onComplete { result in
-            switch result {
-            case .Failure(let err):
-                promise.reject(err)
-            case .Success(let box1):
-                f.onComplete { result2 in
-                    switch result2 {
-                    case .Failure(let err):
-                        promise.reject(err)
-                    case .Success(let box2):
-                        let resultTuple = (box1.value, box2.value)
-                        promise.resolve(resultTuple)
-                    }
-                }
-            }
-            return
-        }
-        
-        return promise.future
     }
     
     public func wait(timeout: dispatch_time_t = DISPATCH_TIME_FOREVER) -> Future<T> {
@@ -185,26 +174,12 @@ public class Future<T> {
             return
         }
 
-        self.isCompleted = true
         self.result = result
         
-        switch (result) {
-        case .Success(let box):
-            for callback in self.successCallbacks {
-                callback(box.value)
-            }
-        case .Failure(let error):
-            for callback in self.failureCallbacks {
-                callback(error)
-            }
-        }
-        
-        for callback in self.completeCallbacks {
+        for callback in self.completionHandlers {
             callback(self.result!)
         }
         
-        self.successCallbacks.removeAll(keepCapacity: false)
-        self.failureCallbacks.removeAll(keepCapacity: false)
-        self.completeCallbacks.removeAll(keepCapacity: false)
+        self.completionHandlers.removeAll(keepCapacity: false)
     }
 }

@@ -25,19 +25,17 @@ func countRepos(repos: [Repository]) -> Int {
     return repos.count
 }
 
-func printComplete(a: Future<Int>) -> Future<Int> {
-    return a.onSuccess {
-        println("Number of Swift repos with 1000+ stars: " + String($0))
-    }
-    .onFailure {
-        println($0)
-    }
-}
-
 let requestURL = NSURL(string: "https://api.github.com/search/repositories?q=language:swift&sort=stars&order=desc")
 
-let future = DeferredURLRequest.requestWithURL(requestURL!) |> parseJSON
+let future = DeferredURLRequest.requestWithURL(requestURL!) ~> (parseJSON
                                                             >>> filterRepos(1000)
-                                                            >>> countRepos
-                                                            >>^ printComplete
+                                                            >>> countRepos)
+future.onSuccess {
+    println("Number of Swift repos with 1000+ stars: " + String($0))
+}
+.onFailure {
+    println($0)
+}
+
 future.wait()
+
